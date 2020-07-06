@@ -56,7 +56,7 @@ app.use(
   })
 );
 
-app.use(mongoSanitize());
+// app.use(mongoSanitize());
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/auth", userRoutes);
