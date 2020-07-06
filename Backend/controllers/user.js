@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 exports.signup = (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
@@ -23,14 +23,22 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
+  // req.check("email", "Votre adresse e-mail n'est pas valide").isEmail();
+  // req
+  //   .check("password", "Votre mot de passe n'est pas valide")
+  //   .isLength({ min: 6 });
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
-        return res.status(401).json({ error: "That username does not exist" });
+        return res
+          .status(401)
+          .json({ error: "Votre adresse e-mail n'est pas valide" });
       }
       bcrypt.compare(req.body.password, user.password).then((valid) => {
         if (!valid) {
-          return res.status(401).json({ error: "password incorrect" });
+          return res
+            .status(401)
+            .json({ error: "Votre mot de passe n'est pas valide" });
         }
         res.status(200).json({
           userId: user._id,
