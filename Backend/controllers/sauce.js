@@ -103,7 +103,7 @@ exports.likeSauce = (req, res, next) => {
               { $inc: { likes: -1 }, $pull: { usersLiked: req.body.userId } }
             )
               .then(() =>
-                res.status(200).json({ message: "Sauce Liked Successfully!" })
+                res.status(200).json({ message: "Sauce UnLiked Successfully!" })
               )
               .catch((error) => res.status(400).json({ error }));
           } else {
@@ -115,7 +115,9 @@ exports.likeSauce = (req, res, next) => {
               }
             )
               .then(() =>
-                res.status(200).json({ message: "Sauce Unliked Successfully!" })
+                res
+                  .status(200)
+                  .json({ message: "Sauce Undisliked Successfully!" })
               )
               .catch((error) => res.status(400).json({ error }));
           }

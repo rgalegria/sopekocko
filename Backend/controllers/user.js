@@ -61,20 +61,15 @@ exports.login = (req, res, next) => {
 // POST Create User Controller
 
 exports.signup = (req, res, next) => {
-  const emailValidation = validator.isEmail(req.body.email);
-  const passwordValidation = passValid.validate(req.body.password, options);
-  console.log("EmailOK?", emailValidation, "passOK?", passwordValidation);
+  // console.log(
+  //   "EmailOK?",
+  //   validator.isEmail(req.body.email),
+  //   "passOK?",
+  //   passValid.validate(req.body.password, options).valid
+  // );
   if (
-    !validator.isEmail(req.body.email) ||
-    !passValid.validate(req.body.password, options)
-  ) {
-    throw {
-      error:
-        "Merci de bien vouloir entrer une adresse email et un mot de passe valide !",
-    };
-  } else if (
-    (validator.isEmail(req.body.email) &&
-      passValid.validate(req.body.password, options)) === true
+    validator.isEmail(req.body.email) &&
+    passValid.validate(req.body.password, options).valid === true
   ) {
     bcrypt
       .hash(req.body.password, 10)
@@ -93,5 +88,9 @@ exports.signup = (req, res, next) => {
           .catch((error) => res.status(400).json({ error }));
       })
       .catch((error) => res.status(500).json({ error }));
+  } else {
+    return res.status(400).json({
+      error: "Votre adresse e-mail et mot de passe ne sont pas valides",
+    });
   }
 };
