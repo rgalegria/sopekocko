@@ -1,4 +1,10 @@
+"use strict";
+
+// Middleware Imports
+
 const multer = require("multer");
+
+// Middleware config.
 
 const MIME_TYPES = {
   "image/jpg": "jpg",
@@ -16,5 +22,7 @@ const storage = multer.diskStorage({
     callback(null, name + Date.now() + "." + extension);
   },
 });
+
+// Export
 
 module.exports = multer({ storage }).single("image");

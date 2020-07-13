@@ -1,13 +1,17 @@
+"use strict";
+
+// Middleware Imports
+
 const fs = require("fs");
 const Sauce = require("../models/sauce");
+
+// POST Create Sauce Controller
 
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
   const sauce = new Sauce({
     ...sauceObject,
-    likes: 0,
-    dislikes: 0,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
     }`,
@@ -18,17 +22,23 @@ exports.createSauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+// GET all Sacuces Controller
+
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
     .catch((error) => res.status(400).json({ error }));
 };
 
+// GET one Sacuce Controller
+
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce))
     .catch((error) => res.status(404).json({ error }));
 };
+
+// PUT Modify Sacuce Controller
 
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file
@@ -49,6 +59,8 @@ exports.modifySauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+// DELETE Sacuce Controller
+
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -64,19 +76,19 @@ exports.deleteSauce = (req, res, next) => {
     .catch((error) => res.status(500).json({ error }));
 };
 
+// POST Like/Dislike Sacuces Controller
+
 exports.likeSauce = (req, res, next) => {
   // console.log(req.body);
-  const likeCase = req.body.like;
-  const user = req.body.userId;
-  switch (likeCase) {
+  switch (req.body.like) {
     case 1:
       // console.log("like added");
       Sauce.updateOne(
         { _id: req.params.id },
-        { $inc: { likes: 1 }, $push: { usersLiked: user } }
+        { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } }
       )
         .then(() =>
-          res.status(200).json({ message: "Sauce Liked Successfully!" })
+          res.status(201).json({ message: "Sauce Liked Successfully!" })
         )
         .catch((error) => res.status(400).json({ error }));
       break;
@@ -84,13 +96,11 @@ exports.likeSauce = (req, res, next) => {
       // console.log("like/dislike deleted");
       Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-          let users = sauce.usersLiked;
-          let inLikedArray = users.includes(user);
           // console.log(inLikedArray);
-          if (inLikedArray === true) {
+          if (sauce.usersLiked.includes(req.body.userId) === true) {
             Sauce.updateOne(
               { _id: req.params.id },
-              { $inc: { likes: -1 }, $pull: { usersLiked: user } }
+              { $inc: { likes: -1 }, $pull: { usersLiked: req.body.userId } }
             )
               .then(() =>
                 res.status(200).json({ message: "Sauce Liked Successfully!" })
@@ -99,7 +109,10 @@ exports.likeSauce = (req, res, next) => {
           } else {
             Sauce.updateOne(
               { _id: req.params.id },
-              { $inc: { dislikes: -1 }, $pull: { usersDisliked: user } }
+              {
+                $inc: { dislikes: -1 },
+                $pull: { usersDisliked: req.body.userId },
+              }
             )
               .then(() =>
                 res.status(200).json({ message: "Sauce Unliked Successfully!" })
@@ -113,10 +126,10 @@ exports.likeSauce = (req, res, next) => {
       // console.log("dislike added");
       Sauce.updateOne(
         { _id: req.params.id },
-        { $inc: { dislikes: 1 }, $push: { usersDisliked: user } }
+        { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } }
       )
         .then(() =>
-          res.status(200).json({ message: "Sauce Disliked Successfully!" })
+          res.status(201).json({ message: "Sauce Disliked Successfully!" })
         )
         .catch((error) => res.status(400).json({ error }));
       break;

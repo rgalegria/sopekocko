@@ -1,32 +1,39 @@
+"use strict";
+
+// Middleware Imports
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const validator = require("validator");
+const passValid = require("secure-password-validator");
+const passBlackList = require("secure-password-validator/build/main/blacklists/first10_000");
+
+// Password Validator Options
+
+const options = {
+  // min password length, default = 8, cannot be less than 8
+  minLength: 10,
+  // max password length, default = 100, cannot be less than 50
+  maxLength: 50,
+  //array with blacklisted passwords default black list with first 1000 most common passwords
+  blacklist: passBlackList,
+  // password Must have numbers, default = false
+  digits: true,
+  // password Must have letters, default = false
+  letters: true,
+  // password Must have uppercase letters, default = false
+  uppercase: true,
+  // password Must have lowercase letters, default = false
+  lowercase: true,
+  // password Must have symbols letters, default = false
+  symbols: false,
+};
 
 const User = require("../models/User");
 
-exports.signup = (req, res, next) => {
-  // console.log(req.body);
-  bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) => {
-      const user = new User({
-        email: req.body.email,
-        password: hash,
-      });
-      user
-        .save()
-        .then(() =>
-          res.status(201).json({ message: "User created successfully!" })
-        )
-        .catch((error) => res.status(400).json({ error }));
-    })
-    .catch((error) => res.status(500).json({ error }));
-};
+// POST Login User Controller
 
 exports.login = (req, res, next) => {
-  // req.check("email", "Votre adresse e-mail n'est pas valide").isEmail();
-  // req
-  //   .check("password", "Votre mot de passe n'est pas valide")
-  //   .isLength({ min: 6 });
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
@@ -49,4 +56,42 @@ exports.login = (req, res, next) => {
       });
     })
     .catch((error) => res.status(500).json({ error }));
+};
+
+// POST Create User Controller
+
+exports.signup = (req, res, next) => {
+  const emailValidation = validator.isEmail(req.body.email);
+  const passwordValidation = passValid.validate(req.body.password, options);
+  console.log("EmailOK?", emailValidation, "passOK?", passwordValidation);
+  if (
+    !validator.isEmail(req.body.email) ||
+    !passValid.validate(req.body.password, options)
+  ) {
+    throw {
+      error:
+        "Merci de bien vouloir entrer une adresse email et un mot de passe valide !",
+    };
+  } else if (
+    (validator.isEmail(req.body.email) &&
+      passValid.validate(req.body.password, options)) === true
+  ) {
+    bcrypt
+      .hash(req.body.password, 10)
+      .then((hash) => {
+        const user = new User({
+          email: req.body.email,
+          password: hash,
+        });
+        user
+          .save()
+          .then(() =>
+            res.status(201).json({
+              message: "User created successfully!",
+            })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      })
+      .catch((error) => res.status(500).json({ error }));
+  }
 };

@@ -1,4 +1,10 @@
+"use strict";
+
+// Middleware Imports
+
 const jwt = require("jsonwebtoken");
+
+// Middleware config.
 
 module.exports = (req, res, next) => {
   try {

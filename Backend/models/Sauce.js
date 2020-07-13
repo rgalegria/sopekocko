@@ -1,4 +1,10 @@
+"use strict";
+
+// Middleware Imports
+
 const mongoose = require("mongoose");
+
+// Schema Structure
 
 const sauceSchema = mongoose.Schema({
   userId: { type: String, required: true, ref: "User" },
@@ -8,10 +14,12 @@ const sauceSchema = mongoose.Schema({
   mainPepper: { type: String, required: true },
   imageUrl: { type: String, required: true },
   heat: { type: Number, required: true },
-  likes: { type: Number, required: true },
-  dislikes: { type: Number, required: true },
-  usersLiked: { type: [String], required: false },
-  usersDisliked: { type: [String], required: false },
+  likes: { type: Number, required: true, default: 0 },
+  dislikes: { type: Number, required: true, default: 0 },
+  usersLiked: [{ type: String, required: false, default: [] }],
+  usersDisliked: [{ type: String, required: false, default: [] }],
 });
+
+// Export
 
 module.exports = mongoose.model("Sauce", sauceSchema);
