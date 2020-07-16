@@ -4,7 +4,7 @@ Le projet a été généré avec [Angular CLI](https://github.com/angular/angula
 
 ## Installation
 
-Démarrer `npm install` pour instaler toutes les dependencies de node.js.
+Démarrer `npm install` pour installer toutes les dependencies de node.js.
 
 ## Development server
 
