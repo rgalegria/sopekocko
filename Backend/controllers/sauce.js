@@ -79,24 +79,38 @@ exports.deleteSauce = (req, res, next) => {
 // POST Like/Dislike Sacuces Controller
 
 exports.likeSauce = (req, res, next) => {
-  // console.log(req.body);
   switch (req.body.like) {
-    case 1:
-      // console.log("like added");
+    case 1: // Like Sauce
       Sauce.updateOne(
         { _id: req.params.id },
-        { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } }
+        {
+          $inc: { likes: 1 },
+          $push: { usersLiked: req.body.userId },
+          _id: req.params.id,
+        }
       )
         .then(() =>
           res.status(201).json({ message: "Sauce Liked Successfully!" })
         )
         .catch((error) => res.status(400).json({ error }));
       break;
-    case 0:
-      // console.log("like/dislike deleted");
+    case -1: // Dislike Sauce
+      Sauce.updateOne(
+        { _id: req.params.id },
+        {
+          $inc: { dislikes: 1 },
+          $push: { usersDisliked: req.body.userId },
+          _id: req.params.id,
+        }
+      )
+        .then(() =>
+          res.status(201).json({ message: "Sauce Disliked Successfully!" })
+        )
+        .catch((error) => res.status(400).json({ error }));
+      break;
+    case 0: // Like ou Dislike Sauce
       Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-          // console.log(inLikedArray);
           if (sauce.usersLiked.includes(req.body.userId) === true) {
             Sauce.updateOne(
               { _id: req.params.id },
@@ -123,17 +137,6 @@ exports.likeSauce = (req, res, next) => {
           }
         })
         .catch((error) => res.status(500).json({ error }));
-      break;
-    case -1:
-      // console.log("dislike added");
-      Sauce.updateOne(
-        { _id: req.params.id },
-        { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } }
-      )
-        .then(() =>
-          res.status(201).json({ message: "Sauce Disliked Successfully!" })
-        )
-        .catch((error) => res.status(400).json({ error }));
       break;
   }
 };

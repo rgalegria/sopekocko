@@ -17,28 +17,21 @@ const toobusy = require("toobusy-js");
 const bouncer = require("express-bouncer")(10000, 600000, 5);
 const mongoSanitize = require("express-mongo-sanitize");
 
-// App Session
-const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
-
 // App Routes
 const sauceRoutes = require("./routes/sauce");
 const userRoutes = require("./routes/user");
 
 // MondoDB Connection
 
+require("dotenv").config();
+
 mongoose
-  .connect(
-    "mongodb+srv://users-sopeckoko:gAFbt8ddOEwJT8W3@cluster0-zcn6k.azure.mongodb.net/SoPekocko?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.MDB_DSN, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connection to MongoDB succeeded !"))
   .catch(() => console.log("Connection to MongoDB failed !"));
-
-const sessionStore = new MongoStore({
-  mongooseConnection: mongoose.connection,
-  collection: "sessions",
-});
 
 // Initialize express App
 
@@ -86,27 +79,7 @@ app.use(function (req, res, next) {
   }
 });
 
-// Express Session Middleware
-
-app.use(
-  session({
-    secret: "RANDOM_TOKEN_SECRET",
-    key: "Access",
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      name: "Some Cookie",
-      secure: false,
-      httpOnly: true,
-      sameSite: true,
-      path: "/",
-      maxAge: 3600 * 24, //3600 = 1 heure X 24 pour une journée
-    },
-  })
-);
-
-// Body Parsers Middleware
+// Body Parser Middleware
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

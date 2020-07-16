@@ -8,15 +8,19 @@ const validator = require("validator");
 const passValid = require("secure-password-validator");
 const passBlackList = require("secure-password-validator/build/main/blacklists/first10_000");
 
+// Route Mongoose Model
+
+const User = require("../models/User");
+
 // Password Validator Options
 
 const options = {
   // min password length, default = 8, cannot be less than 8
-  minLength: 10,
+  minLength: 8,
   // max password length, default = 100, cannot be less than 50
   maxLength: 50,
   //array with blacklisted passwords default black list with first 1000 most common passwords
-  blacklist: passBlackList,
+  // blacklist: passBlackList,
   // password Must have numbers, default = false
   digits: true,
   // password Must have letters, default = false
@@ -28,8 +32,6 @@ const options = {
   // password Must have symbols letters, default = false
   symbols: false,
 };
-
-const User = require("../models/User");
 
 // POST Login User Controller
 
@@ -61,15 +63,9 @@ exports.login = (req, res, next) => {
 // POST Create User Controller
 
 exports.signup = (req, res, next) => {
-  // console.log(
-  //   "EmailOK?",
-  //   validator.isEmail(req.body.email),
-  //   "passOK?",
-  //   passValid.validate(req.body.password, options).valid
-  // );
   if (
     validator.isEmail(req.body.email) &&
-    passValid.validate(req.body.password, options).valid === true
+    passValid.validate(req.body.password, options).valid
   ) {
     bcrypt
       .hash(req.body.password, 10)
@@ -88,7 +84,10 @@ exports.signup = (req, res, next) => {
           .catch((error) => res.status(400).json({ error }));
       })
       .catch((error) => res.status(500).json({ error }));
-  } else {
+  } else if (
+    !validator.isEmail(req.body.email) ||
+    !passValid.validate(req.body.password, options).valid
+  ) {
     return res.status(400).json({
       error: "Votre adresse e-mail et mot de passe ne sont pas valides",
     });
