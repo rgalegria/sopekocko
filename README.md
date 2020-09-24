@@ -8,11 +8,13 @@
 
 ## Backend
 
-Le projet a été crée avec Node.js et Express.js.
+Le projet a été crée avec Node.js et Express.js. Assurez-vous de bien installer Node.js avant de continuer.
 
 ## Installation
 
-À partir du dossier du projet, démarrer `npm install` pour installer toutes les dependencies du backend.
+À partir du dossier `/backend`, démarrer `npm install` pour installer toutes les dependencies du backend.
+</br>
+Sur le même dossier, modifiez et sauvagardez le fichier .env avec votre string d'accès de votre base de données MongoDB.
 
 ## Development server
 
@@ -26,7 +28,7 @@ Si vous trouvez des problèmes d'installation, rendez-vous sur `https://github.c
 
 ## Installation
 
-À partir du dossier du projet, démarrer `npm install` pour installer toutes les dependencies du backend.
+À partir du dossier `/frontend`, démarrer `npm install` pour installer toutes les dependencies du frontend.
 
 ## Development server
 
